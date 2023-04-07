@@ -38,15 +38,6 @@ public:
         cout << endl;
     }
 
-    /*Buffer* skip(int bytes) {
-        char array[bytes];
-        std::copy(&*buffer, &*(buffer + bytes), array);
-        Buffer* buff = new Buffer(*array, bytes);
-
-        buffer += bytes;
-        return buff;
-    }*/
-
     int read_byte() {
         char val = *buffer;
         buffer++;
