@@ -35,7 +35,17 @@ public:
                 cout << " ";
             }
         }
+        cout << endl;
     }
+
+    /*Buffer* skip(int bytes) {
+        char array[bytes];
+        std::copy(&*buffer, &*(buffer + bytes), array);
+        Buffer* buff = new Buffer(*array, bytes);
+
+        buffer += bytes;
+        return buff;
+    }*/
 
     int read_byte() {
         char val = *buffer;
@@ -47,6 +57,12 @@ public:
         unsigned short val = *(unsigned short *) buffer;
         buffer += 2;
         return system_endianness == LE ? boost::endian::endian_reverse(val) : val;
+    }
+
+    unsigned short read_unsigned_short_le() {
+        unsigned short val = *(unsigned short *) buffer;
+        buffer += 2;
+        return system_endianness == BE ? boost::endian::endian_reverse(val) : val;
     }
 
     short read_short() {
