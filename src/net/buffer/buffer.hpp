@@ -38,6 +38,94 @@ public:
         cout << endl;
     }
 
+    void write_byte(char val) {
+        *buffer = val;
+        buffer++;
+    }
+
+    void write_unsigned_short(unsigned short val) {
+        val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
+        *(unsigned short*)buffer = val;
+        buffer += 2;
+    }
+
+    void write_unsigned_short_le(unsigned short val) {
+        val = system_endianness == BE ? boost::endian::endian_reverse(val) : val;
+        *(unsigned short*)buffer = val;
+        buffer += 2;
+    }
+
+    void write_short(short val) {
+        val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
+        *(short*)buffer = val;
+        buffer += 2;
+    }
+
+    void write_short_le(short val) {
+        val = system_endianness == BE ? boost::endian::endian_reverse(val) : val;
+        *(short*)buffer = val;
+        buffer += 2;
+    }
+
+    void write_packed_unsigned_int(unsigned int value)
+    {
+        do
+        {
+            int b = (int)(value & 0xFF);
+            if (value >= 0x80)
+            {
+                b |= 0x80;
+            }
+
+            write_byte(b);
+            value >>= 7;
+        } while (value > 0);
+    }
+
+    void write_packed__int(int value)
+    {
+        write_packed_unsigned_int((unsigned int) value);
+    }
+
+    void write_int(int val) {
+        val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
+        *(short*)buffer = val;
+        buffer += 4;
+    }
+    void write_int_le(int val) {
+        val = system_endianness == BE ? boost::endian::endian_reverse(val) : val;
+        *(short*)buffer = val;
+        buffer += 4;
+    }
+
+    void write_unsigned_long(unsigned long val) {
+        val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
+        *(short*)buffer = val;
+        buffer += 8;
+    }
+    void write_unsigned_long_le(unsigned long val) {
+        val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
+        *(short*)buffer = val;
+        buffer += 8;
+    }
+
+    void write_long(long val) {
+        val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
+        *(short*)buffer = val;
+        buffer += 8;
+    }
+    void write_long_le(long val) {
+        val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
+        *(short*)buffer = val;
+        buffer += 8;
+    }
+
+    void write_string(string val) {
+        write_packed_unsigned_int(val.size());
+        std::memcpy(buffer, val.c_str(), val.size());
+        buffer += val.size();
+    }
+
     int read_byte() {
         char val = *buffer;
         buffer++;
@@ -60,10 +148,6 @@ public:
         short val = *(short *) buffer;
         buffer += 2;
         return system_endianness == LE ? boost::endian::endian_reverse(val) : val;
-    }
-
-    int read_packed_int() {
-        return (int) read_packed_unsigned_int();
     }
 
     unsigned int read_packed_unsigned_int() {
@@ -93,10 +177,8 @@ public:
         return output;
     }
 
-    int read_int() {
-        int val = *(int *) buffer;
-        buffer += 4;
-        return system_endianness == LE ? boost::endian::endian_reverse(val) : val;
+    int read_packed_int() {
+        return (int) read_packed_unsigned_int();
     }
 
     unsigned int read_unsigned_int() {
@@ -105,14 +187,20 @@ public:
         return system_endianness == LE ? boost::endian::endian_reverse(val) : val;
     }
 
-    int read_long() {
-        long val = *(long *) buffer;
-        buffer += 8;
+    int read_int() {
+        int val = *(int *) buffer;
+        buffer += 4;
         return system_endianness == LE ? boost::endian::endian_reverse(val) : val;
     }
 
     int read_unsigned_long() {
         unsigned long val = *(unsigned long *) buffer;
+        buffer += 8;
+        return system_endianness == LE ? boost::endian::endian_reverse(val) : val;
+    }
+
+    int read_long() {
+        long val = *(long *) buffer;
         buffer += 8;
         return system_endianness == LE ? boost::endian::endian_reverse(val) : val;
     }
