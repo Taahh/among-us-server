@@ -2,6 +2,7 @@
 #define HELLO_PACKET_HPP
 
 #include "../packet.hpp"
+#include "../packets.hpp"
 #include "../../buffer/hazel.hpp"
 
 class PlatformSpecificData : public Deserializable {
@@ -16,6 +17,7 @@ public:
 class HelloPacket : public Packet {
 private:
     unsigned short nonce;
+    string username;
 public:
     HelloPacket(unsigned short nonce): nonce(nonce) {}
     void serialize(Buffer &buffer) override {
@@ -26,7 +28,9 @@ public:
         cout << "HELLO PACKET" << endl;
         printf("Hazel Version: %d\n", buffer.read_byte());
         printf("Client Version: %d\n", buffer.read_int());
-        printf("Username: %s\n", buffer.read_string().c_str());
+        string username = buffer.read_string();
+        printf("Username: %s\n", username.c_str());
+        this->username = username;
         //DTLS Not Supported
         printf("Last Nonce Received: %d\n", buffer.read_unsigned_int());
         printf("Current Language: %d\n", buffer.read_unsigned_int());
@@ -36,6 +40,17 @@ public:
         buffer.read_string();
         buffer.read_unsigned_int();
         cout << endl;
+    }
+
+    void process_packet(Connection &connection) override {
+        connection.setClientName(this->username);
+        cout << "Connection name set to " << connection.getClientName() << endl;
+        cout << "Hello packet from: " << *connection.getEndpoint() << endl;
+
+        Buffer ack(4096);
+        AcknowledgementPacket ackPacket(this->nonce);
+        ackPacket.serialize(ack);
+        connection.sendPacket(ack);
     }
 };
 

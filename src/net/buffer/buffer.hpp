@@ -26,6 +26,11 @@ private:
 public:
     Buffer(char &buffer, unsigned int size) : buffer(&buffer), size(size) {}
 
+    Buffer(int size) {
+        this->buffer = new char[size];
+        this->size = 0;
+    }
+
     void print() {
         cout << "SIZE: " << getSize() << endl;
         cout << "DATA: ";
@@ -38,42 +43,40 @@ public:
         cout << endl;
     }
 
-    void write_byte(char val) {
-        *buffer = val;
-        buffer++;
+    void write_byte(int val) {
+        *(int*)(buffer + size) = val;
+//        std::memcpy(buffer, &val, sizeof(val));
+        size++;
     }
 
     void write_unsigned_short(unsigned short val) {
         val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
-        *(unsigned short*)buffer = val;
-        buffer += 2;
+        *(unsigned short *) (buffer + size) = val;
+        size += 2;
     }
 
     void write_unsigned_short_le(unsigned short val) {
         val = system_endianness == BE ? boost::endian::endian_reverse(val) : val;
-        *(unsigned short*)buffer = val;
-        buffer += 2;
+        *(unsigned short *) (buffer + size) = val;
+        size += 2;
     }
 
     void write_short(short val) {
         val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
-        *(short*)buffer = val;
-        buffer += 2;
+        *(short *) (buffer + size) = val;
+        size += 2;
     }
 
     void write_short_le(short val) {
         val = system_endianness == BE ? boost::endian::endian_reverse(val) : val;
-        *(short*)buffer = val;
-        buffer += 2;
+        *(short *) (buffer + size) = val;
+        size += 2;
     }
 
-    void write_packed_unsigned_int(unsigned int value)
-    {
-        do
-        {
-            int b = (int)(value & 0xFF);
-            if (value >= 0x80)
-            {
+    void write_packed_unsigned_int(unsigned int value) {
+        do {
+            int b = (int) (value & 0xFF);
+            if (value >= 0x80) {
                 b |= 0x80;
             }
 
@@ -82,48 +85,50 @@ public:
         } while (value > 0);
     }
 
-    void write_packed__int(int value)
-    {
+    void write_packed__int(int value) {
         write_packed_unsigned_int((unsigned int) value);
     }
 
     void write_int(int val) {
         val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
-        *(short*)buffer = val;
-        buffer += 4;
+        *(short *) (buffer + size) = val;
+        size += 4;
     }
+
     void write_int_le(int val) {
         val = system_endianness == BE ? boost::endian::endian_reverse(val) : val;
-        *(short*)buffer = val;
-        buffer += 4;
+        *(short *) (buffer + size) = val;
+        size += 4;
     }
 
     void write_unsigned_long(unsigned long val) {
         val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
-        *(short*)buffer = val;
-        buffer += 8;
+        *(short *) (buffer + size) = val;
+        size += 8;
     }
+
     void write_unsigned_long_le(unsigned long val) {
-        val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
-        *(short*)buffer = val;
-        buffer += 8;
+        val = system_endianness == BE ? boost::endian::endian_reverse(val) : val;
+        *(short *) (buffer + size) = val;
+        size += 8;
     }
 
     void write_long(long val) {
         val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
-        *(short*)buffer = val;
-        buffer += 8;
+        *(short *) (buffer + size) = val;
+        size += 8;
     }
+
     void write_long_le(long val) {
-        val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
-        *(short*)buffer = val;
-        buffer += 8;
+        val = system_endianness == BE ? boost::endian::endian_reverse(val) : val;
+        *(short *) (buffer + size) = val;
+        size += 8;
     }
 
     void write_string(string val) {
         write_packed_unsigned_int(val.size());
-        std::memcpy(buffer, val.c_str(), val.size());
-        buffer += val.size();
+        std::memcpy(buffer + size, val.c_str(), val.size());
+        size += val.size();
     }
 
     int read_byte() {
@@ -155,22 +160,18 @@ public:
         int shift = 0;
         unsigned int output = 0;
 
-        while (read_more)
-        {
+        while (read_more) {
             if (buffer + 1 == nullptr) throw new out_of_range("Read length is longer than message length.");
 
             int b = read_byte();
-            if (b >= 0x80)
-            {
+            if (b >= 0x80) {
                 read_more = true;
                 b ^= 0x80;
-            }
-            else
-            {
+            } else {
                 read_more = false;
             }
 
-            output |= (unsigned int)(b << shift);
+            output |= (unsigned int) (b << shift);
             shift += 7;
         }
 
@@ -212,6 +213,9 @@ public:
         return data;
     }
 
+    char *getBuffer() const {
+        return buffer;
+    }
 
     unsigned int getSize() const {
         return size;

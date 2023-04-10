@@ -2,6 +2,7 @@
 #define PACKET_HPP
 
 #include "../buffer/buffer.hpp"
+#include "../../connection.hpp"
 
 class Serializable {
 public:
@@ -14,6 +15,8 @@ public:
 };
 
 class Packet : public Serializable, public Deserializable {
+public:
+    virtual void process_packet(Connection& connection) = 0;
 
 };
 
