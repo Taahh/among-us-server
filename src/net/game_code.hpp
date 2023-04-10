@@ -19,11 +19,6 @@ public:
         arr[3] = CHARS[num2 / 26 % 26];
         arr[4] = CHARS[num2 / 676 % 26];
         arr[5] = CHARS[num2 / 17576 % 26];
-        for (const auto &item: arr) {
-            if (item < 'A' || item > 'z') {
-                return "";
-            }
-        }
         return string(arr);
     }
 
