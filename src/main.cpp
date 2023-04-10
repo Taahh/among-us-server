@@ -18,7 +18,7 @@ int main() {
     cout << "Listening for connections" << endl;
 
     char buf[4096];
-    for (;;) {
+    for (;;) { //TODO: Remember to clear memory leaks by deleting connections in the connections map
         auto data = asio::buffer(buf);
 
         udp::endpoint remote_endpoint;
@@ -46,6 +46,5 @@ int main() {
             packet.deserialize(buffer);
             packet.process_packet(*connection);
         }
-
     }
 }
