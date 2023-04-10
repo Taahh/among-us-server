@@ -20,7 +20,7 @@ private:
     string username;
 public:
     HelloPacket(unsigned short nonce): nonce(nonce) {}
-    void serialize(Buffer &buffer) override {
+    Buffer* serialize() override {
 
     }
 
@@ -47,10 +47,8 @@ public:
         cout << "Connection name set to " << connection.getClientName() << endl;
         cout << "Hello packet from: " << *connection.getEndpoint() << endl;
 
-        Buffer ack(4096);
         AcknowledgementPacket ackPacket(this->nonce);
-        ackPacket.serialize(ack);
-        connection.sendPacket(ack);
+        connection.sendPacket(*ackPacket.serialize());
     }
 };
 

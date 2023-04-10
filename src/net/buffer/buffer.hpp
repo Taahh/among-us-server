@@ -31,6 +31,10 @@ public:
         this->size = 0;
     }
 
+    void seek(int amount) {
+        this->buffer += amount;
+    }
+
     void print() {
         cout << "SIZE: " << getSize() << endl;
         cout << "DATA: ";

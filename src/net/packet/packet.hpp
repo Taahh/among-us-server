@@ -6,7 +6,7 @@
 
 class Serializable {
 public:
-    virtual void serialize(Buffer& buffer) = 0;
+    virtual Buffer* serialize() = 0;
 };
 
 class Deserializable {

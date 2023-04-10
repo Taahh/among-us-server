@@ -24,6 +24,7 @@ public:
 
     void sendPacket(const Buffer& buffer) {
         socket->send_to(asio::buffer(buffer.getBuffer(), buffer.getSize()), *this->endpoint);
+        delete &buffer;
     }
 
     udp::endpoint *getEndpoint() const {
