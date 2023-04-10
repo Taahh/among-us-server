@@ -3,6 +3,7 @@
 
 #include "../../packet.hpp"
 #include "../../../buffer/hazel.hpp"
+#include "../../../game_code.hpp"
 
 class HostServer : public Packet {
 public:
