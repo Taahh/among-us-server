@@ -2,7 +2,7 @@
 #define PACKET_HPP
 
 #include "../buffer/buffer.hpp"
-#include "../../connection.hpp"
+#include "../connection.hpp"
 
 class Serializable {
 public:

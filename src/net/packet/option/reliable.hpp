@@ -2,7 +2,6 @@
 #define RELIABLE_PACKET_HPP
 
 #include <queue>
-#include "reliable/reliables.hpp"
 #include "../packet.hpp"
 #include "../../buffer/hazel.hpp"
 
@@ -13,17 +12,11 @@ private:
     queue<Packet*> toDo;
 
 public:
-    ReliablePacket(unsigned short nonce) : nonce(nonce) {
-        this->reliables[0x00] = new HostServer();
-    }
+    ReliablePacket(unsigned short nonce);
 
-    ReliablePacket(unsigned short nonce, queue<Packet*> serialize) : nonce(nonce) {
-        this->toDo = serialize;
-    }
+    ReliablePacket(unsigned short nonce, queue<Packet*> serialize);
 
-    ReliablePacket(unsigned short nonce, Packet* serialize) : nonce(nonce) {
-        this->toDo.push(serialize);
-    }
+    ReliablePacket(unsigned short nonce, Packet* serialize);
 
     ~ReliablePacket() {
         for (const auto &item: reliables) {

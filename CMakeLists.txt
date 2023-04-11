@@ -22,5 +22,10 @@ FIND_PACKAGE(Boost COMPONENTS system program_options)
 
 add_executable(among_us_server
         src/main.cpp
-        src/net/packet/packets.hpp)
+        src/net/connection.cpp
+        src/net/buffer/buffer.hpp
+        src/net/buffer/hazel.hpp
+        src/net/packet/packets.cpp
+        src/net/packet/option/root/roots.cpp
+        src/net/game_code.cpp)
 

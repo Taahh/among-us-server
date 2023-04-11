@@ -2,7 +2,7 @@
 #include <boost/unordered_map.hpp>
 #include <boost/asio.hpp>
 
-#include "connection.hpp"
+#include "net/connection.hpp"
 #include "net/buffer/buffer.hpp"
 #include "net/packet/packets.hpp"
 
