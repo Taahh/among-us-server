@@ -31,10 +31,6 @@ public:
         this->size = 0;
     }
 
-    void seek(int amount) {
-        this->buffer += amount;
-    }
-
     void print() {
         cout << "SIZE: " << getSize() << endl;
         cout << "DATA: ";
@@ -48,7 +44,7 @@ public:
     }
 
     void write_byte(int val) {
-        *(int*)(buffer + size) = val;
+        *(char*)(buffer + size) = (char)val;
 //        std::memcpy(buffer, &val, sizeof(val));
         size++;
     }
@@ -93,39 +89,51 @@ public:
         write_packed_unsigned_int((unsigned int) value);
     }
 
+    void write_unsigned_int(unsigned int val) {
+        val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
+        *(unsigned int *) (buffer + size) = val;
+        size += 4;
+    }
+
+    void write_unsigned_int_le(unsigned int val) {
+        val = system_endianness == BE ? boost::endian::endian_reverse(val) : val;
+        *(unsigned int *) (buffer + size) = val;
+        size += 4;
+    }
+
     void write_int(int val) {
         val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
-        *(short *) (buffer + size) = val;
+        *(int *) (buffer + size) = val;
         size += 4;
     }
 
     void write_int_le(int val) {
         val = system_endianness == BE ? boost::endian::endian_reverse(val) : val;
-        *(short *) (buffer + size) = val;
+        *(int *) (buffer + size) = val;
         size += 4;
     }
 
     void write_unsigned_long(unsigned long val) {
         val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
-        *(short *) (buffer + size) = val;
+        *(unsigned long *) (buffer + size) = val;
         size += 8;
     }
 
     void write_unsigned_long_le(unsigned long val) {
         val = system_endianness == BE ? boost::endian::endian_reverse(val) : val;
-        *(short *) (buffer + size) = val;
+        *(unsigned long *) (buffer + size) = val;
         size += 8;
     }
 
     void write_long(long val) {
         val = system_endianness == LE ? boost::endian::endian_reverse(val) : val;
-        *(short *) (buffer + size) = val;
+        *(long *) (buffer + size) = val;
         size += 8;
     }
 
     void write_long_le(long val) {
         val = system_endianness == BE ? boost::endian::endian_reverse(val) : val;
-        *(short *) (buffer + size) = val;
+        *(long *) (buffer + size) = val;
         size += 8;
     }
 

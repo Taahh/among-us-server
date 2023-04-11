@@ -65,5 +65,10 @@ int main() {
             packet.deserialize(buffer);
             packet.process_packet(*connection);
         }
+        if (packet_id == 0x0c) {
+            unsigned short nonce = buffer.read_unsigned_short();
+            AcknowledgementPacket ack(nonce);
+            connection->sendPacket(*ack.serialize());
+        }
     }
 }

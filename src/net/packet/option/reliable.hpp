@@ -43,6 +43,9 @@ public:
     }
 
     void process_packet(Connection &connection) override {
+        AcknowledgementPacket ackPacket(this->nonce);
+        connection.sendPacket(*ackPacket.serialize());
+
         while (!process.empty()) {
             process.front()->process_packet(connection);
             process.pop();

@@ -21,7 +21,7 @@ private:
 public:
     HelloPacket(unsigned short nonce): nonce(nonce) {}
     Buffer* serialize() override {
-
+        return nullptr;
     }
 
     void deserialize(Buffer &buffer) override {
