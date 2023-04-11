@@ -43,6 +43,12 @@ public:
         cout << endl;
     }
 
+    void write_buffer(Buffer& buffer) {
+        *(char*)(this->buffer + size) = *buffer.buffer;
+        size += buffer.getSize();
+        delete &buffer;
+    }
+
     void write_byte(int val) {
         *(char*)(buffer + size) = (char)val;
 //        std::memcpy(buffer, &val, sizeof(val));

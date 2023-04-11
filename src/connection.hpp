@@ -1,3 +1,8 @@
+#ifndef CONNECTION_HPP
+#define CONNECTION_HPP
+
+#include <queue>
+#include "./net/buffer/buffer.hpp"
 #include <boost/asio.hpp>
 #include <boost/functional/hash.hpp>
 #include <boost/unordered_set.hpp>
@@ -7,11 +12,6 @@
 namespace asio = boost::asio;
 using asio::ip::udp;
 using namespace std;
-
-#ifndef CONNECTION_HPP
-#define CONNECTION_HPP
-
-#include "./net/buffer/buffer.hpp"
 
 class Connection {
 private:

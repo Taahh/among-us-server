@@ -16,6 +16,7 @@ public:
 
 class Packet : public Serializable, public Deserializable {
 public:
+    virtual ~Packet() {}
     virtual void process_packet(Connection& connection) = 0;
 
 };

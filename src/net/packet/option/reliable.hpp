@@ -2,20 +2,27 @@
 #define RELIABLE_PACKET_HPP
 
 #include <queue>
-
+#include "reliable/reliables.hpp"
 #include "../packet.hpp"
-#include "../packets.hpp"
 #include "../../buffer/hazel.hpp"
 
 class ReliablePacket : public Packet {
 private:
     unsigned short nonce;
     unordered_map<int, Packet *> reliables;
-    queue<Packet*> process;
+    queue<Packet*> toDo;
 
 public:
     ReliablePacket(unsigned short nonce) : nonce(nonce) {
         this->reliables[0x00] = new HostServer();
+    }
+
+    ReliablePacket(unsigned short nonce, queue<Packet*> serialize) : nonce(nonce) {
+        this->toDo = serialize;
+    }
+
+    ReliablePacket(unsigned short nonce, Packet* serialize) : nonce(nonce) {
+        this->toDo.push(serialize);
     }
 
     ~ReliablePacket() {
@@ -25,10 +32,12 @@ public:
     }
 
     Buffer *serialize() override {
-//        Buffer buffer(4096);
-//        buffer.write_byte(0x0a);
-//        buffer.write_unsigned_short(this->nonce);
-//        buffer.write_byte(255);
+        Buffer* buffer = new Buffer(4096);
+        buffer->write_byte(0x01);
+        buffer->write_unsigned_short(this->nonce);
+        while (!this->toDo.empty()) {
+            buffer->write_buffer(*this->toDo.front()->serialize());
+        }
     }
 
     void deserialize(Buffer &buffer) override {
@@ -36,7 +45,7 @@ public:
             HazelMessage hazel = HazelMessage::read_message(buffer);
             if (reliables.contains(hazel.getTag())) {
                 reliables[hazel.getTag()]->deserialize(*hazel.getBuffer());
-                process.push(reliables[hazel.getTag()]);
+                toDo.push(reliables[hazel.getTag()]);
             }
             break;
         }
@@ -46,9 +55,9 @@ public:
         AcknowledgementPacket ackPacket(this->nonce);
         connection.sendPacket(*ackPacket.serialize());
 
-        while (!process.empty()) {
-            process.front()->process_packet(connection);
-            process.pop();
+        while (!toDo.empty()) {
+            toDo.front()->process_packet(connection);
+            toDo.pop();
         }
     }
 };
