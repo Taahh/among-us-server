@@ -1,7 +1,7 @@
-#include "../reliable.hpp"
 #ifndef RELIABLE_HOST_PACKET_HPP
 #define RELIABLE_HOST_PACKET_HPP
 
+#include "../reliable.hpp"
 #include "../../packet.hpp"
 #include "../../../buffer/hazel.hpp"
 #include "../../../game_code.hpp"
