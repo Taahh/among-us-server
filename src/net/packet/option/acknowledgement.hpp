@@ -10,13 +10,7 @@ private:
 public:
     AcknowledgementPacket(unsigned short nonce): nonce(nonce) {}
 
-    Buffer* serialize() override {
-        Buffer* buffer = new Buffer(4096);
-        buffer->write_byte(0x0a);
-        buffer->write_unsigned_short(this->nonce);
-        buffer->write_byte(255);
-        return buffer;
-    }
+    Buffer* serialize() override;
 
     void deserialize(Buffer &buffer) override {
     }
