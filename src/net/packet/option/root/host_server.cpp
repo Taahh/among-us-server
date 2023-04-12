@@ -10,6 +10,7 @@ Buffer *HostServer::serialize() {
 }
 
 void HostServer::process_packet(Connection &connection) {
-    ReliablePacket reliable(connection.getLastNonceReceived(), this);
-    connection.sendPacket(*reliable.serialize());
+    ReliablePacket reliable(connection.getNextNonce(), *this->serialize());
+    reliable.serialize();
+//    connection.sendPacket(*reliable.serialize());
 }

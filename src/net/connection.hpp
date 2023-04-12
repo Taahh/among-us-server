@@ -19,8 +19,9 @@ private:
     udp::socket* socket;
     string client_name;
     int last_nonce_received;
+    int next_nonce;
 public:
-    Connection(udp::endpoint &endpoint, udp::socket& socket) : endpoint(&endpoint), socket(&socket), client_name(""), last_nonce_received(0) {}
+    Connection(udp::endpoint &endpoint, udp::socket& socket) : endpoint(&endpoint), socket(&socket), client_name(""), last_nonce_received(0), next_nonce(0) {}
 
     void sendPacket(const Buffer& buffer);
 
@@ -46,6 +47,10 @@ public:
 
     void setLastNonceReceived(int lastNonceReceived) {
         this->last_nonce_received = lastNonceReceived;
+    }
+
+    int getNextNonce() {
+        return next_nonce++;
     }
 
 

@@ -10,49 +10,26 @@ private:
     unsigned short nonce;
     unordered_map<int, Packet *> reliables;
     queue<Packet*> toDo;
-
+    queue<Buffer*> toSerialize;
 public:
     ReliablePacket(unsigned short nonce);
 
-    ReliablePacket(unsigned short nonce, queue<Packet*> serialize);
-
-    ReliablePacket(unsigned short nonce, Packet* serialize);
+    ReliablePacket(unsigned short nonce, Buffer& serialize);
 
     ~ReliablePacket() {
         for (const auto &item: reliables) {
             delete item.second;
         }
-    }
-
-    Buffer *serialize() override {
-        Buffer* buffer = new Buffer(4096);
-        buffer->write_byte(0x01);
-        buffer->write_unsigned_short(this->nonce);
-        while (!this->toDo.empty()) {
-            buffer->write_buffer(*this->toDo.front()->serialize());
-        }
-    }
-
-    void deserialize(Buffer &buffer) override {
-        while (buffer.getBuffer() != nullptr) {
-            HazelMessage hazel = HazelMessage::read_message(buffer);
-            if (reliables.contains(hazel.getTag())) {
-                reliables[hazel.getTag()]->deserialize(*hazel.getBuffer());
-                toDo.push(reliables[hazel.getTag()]);
-            }
-            break;
-        }
-    }
-
-    void process_packet(Connection &connection) override {
-        AcknowledgementPacket ackPacket(this->nonce);
-        connection.sendPacket(*ackPacket.serialize());
-
         while (!toDo.empty()) {
-            toDo.front()->process_packet(connection);
-            toDo.pop();
+            delete toDo.front();
         }
     }
+
+    Buffer *serialize() override;
+
+    void deserialize(Buffer &buffer) override;
+
+    void process_packet(Connection &connection) override;
 };
 
 #endif //RELIABLE_PACKET_HPP
