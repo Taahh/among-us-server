@@ -12,6 +12,8 @@ add_executable(among_us_server
         src/main.cpp
         src/net/connection.cpp
         src/net/buffer/buffer.cpp
+        src/net/inner/options.cpp
+        src/net/inner/constants.hpp
         src/net/packet/packets.cpp
         src/net/packet/option/root/roots.cpp
         src/net/game_code.cpp)

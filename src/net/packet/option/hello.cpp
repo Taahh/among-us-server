@@ -1,13 +1,14 @@
 #include "hello.hpp"
 #include "acknowledgement.hpp"
 
-void PlatformSpecificData::deserialize(Buffer &buffer) {
+bool PlatformSpecificData::deserialize(Buffer &buffer) {
     HazelMessage hazelMessage = HazelMessage::read_message(buffer);
     printf("Platform: %d\n", hazelMessage.getTag());
     printf("Platform Name: %s\n", hazelMessage.getBuffer()->read_string().c_str());
+    return true;
 }
 
-void HelloPacket::deserialize(Buffer &buffer) {
+bool HelloPacket::deserialize(Buffer &buffer) {
     cout << "HELLO PACKET" << endl;
     printf("Hazel Version: %d\n", buffer.read_byte());
     printf("Client Version: %d\n", buffer.read_int());
@@ -23,6 +24,7 @@ void HelloPacket::deserialize(Buffer &buffer) {
     buffer.read_string();
     buffer.read_unsigned_int();
     cout << endl;
+    return true;
 }
 
 void HelloPacket::process_packet(Connection &connection) {
@@ -31,5 +33,5 @@ void HelloPacket::process_packet(Connection &connection) {
     cout << "Hello packet from: " << *connection.getEndpoint() << endl;
 
     AcknowledgementPacket ackPacket(this->nonce);
-    connection.sendPacket(*ackPacket.serialize());
+    connection.sendPacket(ackPacket);
 }

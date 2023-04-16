@@ -10,18 +10,17 @@ ReliablePacket::ReliablePacket(unsigned short nonce, Buffer &serialize) : nonce(
     this->toSerialize.push(&serialize);
 }
 
-Buffer *ReliablePacket::serialize() {
-    Buffer *buffer = new Buffer(4096);
-    buffer->write_byte(0x01);
-    buffer->write_unsigned_short(this->nonce);
+void ReliablePacket::serialize(Buffer& buffer) {
+    buffer.write_byte(0x01);
+    buffer.write_unsigned_short(this->nonce);
     while (this->toSerialize.front() && !this->toSerialize.empty()) {
-        buffer->write_buffer(*this->toSerialize.front());
+        buffer.write_buffer(*this->toSerialize.front());
 //        delete this->toSerialize.front();
         this->toSerialize.pop();
     }
 }
 
-void ReliablePacket::deserialize(Buffer &buffer) {
+bool ReliablePacket::deserialize(Buffer &buffer) {
     while (buffer.getBuffer() != nullptr) {
         HazelMessage hazel = HazelMessage::read_message(buffer);
         if (reliables.contains(hazel.getTag())) {
@@ -31,11 +30,12 @@ void ReliablePacket::deserialize(Buffer &buffer) {
         break;
     }
     cout << "done deserializing" << endl;
+    return true;
 }
 
 void ReliablePacket::process_packet(Connection &connection) {
     AcknowledgementPacket ackPacket(this->nonce);
-    connection.sendPacket(*ackPacket.serialize());
+    connection.sendPacket(ackPacket);
     cout << "acked" << endl;
     while (!toDo.empty()) {
         toDo.front()->process_packet(connection);

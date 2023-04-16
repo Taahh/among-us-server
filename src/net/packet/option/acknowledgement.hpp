@@ -10,9 +10,10 @@ private:
 public:
     AcknowledgementPacket(unsigned short nonce): nonce(nonce) {}
 
-    Buffer* serialize() override;
+    void serialize(Buffer& buffer) override;
 
-    void deserialize(Buffer &buffer) override {
+    bool deserialize(Buffer &buffer) override {
+        return false;
     }
 
     void process_packet(Connection &connection) override {

@@ -15,7 +15,19 @@ using asio::ip::udp;
 using namespace std;
 
 //static const
-boost::unordered_map<string, Connection *> connections;
+static boost::unordered_map<string, Connection *> connections;
+
+void handleInput(int& runServer) {
+    auto s = ""s;
+    while (true) {
+        if (std::cin >> s) {
+            if (s == "stop") {
+                runServer = 0;
+                exit(1);
+            }
+        }
+    }
+}
 
 void signalHandle(int signum) {
     for (const auto &item: connections) {
@@ -27,18 +39,23 @@ void signalHandle(int signum) {
 }
 
 int main() {
-    ColoredAppender<plog::TxtFormatter> consoleAppender;
-    plog::init(plog::Severity::debug, "log.txt").addAppender(&consoleAppender);
     std::signal(SIGTERM, signalHandle);
     std::signal(SIGABRT, signalHandle);
 
+    ColoredAppender<plog::TxtFormatter> consoleAppender;
+    plog::init(plog::Severity::debug, "log.txt").addAppender(&consoleAppender);
+
     io_context context;
     udp::socket socket(context, udp::endpoint(udp::v4(), 22023));
-//    cout << "Listening for connections" << endl;
     LOG(plog::info) << "Listening for connections" << endl;
 
+    int runServer = 1;
+    thread input(handleInput, ref(runServer));
+
     char buf[4096];
-    for (;;) {
+    while (runServer == 1) {
+        cout << "bruh" << endl;
+
         auto data = asio::buffer(buf);
 
         udp::endpoint remote_endpoint;
@@ -50,9 +67,13 @@ int main() {
             connection = new Connection(remote_endpoint, socket);
             connections[remote_endpoint.address().to_string()] = connection;
         }
-        LOG(plog::debug) << "Packet from " << remote_endpoint;
-        if (connection->getClientName() != "") LOG(plog::debug) << ", user: " << connection->getClientName() << endl;
-        else LOG(plog::debug) << endl;
+        ostringstream message;
+
+        message << "Packet from " << remote_endpoint;
+        if (connection->getClientName() != "") message << ", user: " << connection->getClientName() << endl;
+        else message << endl;
+
+        PLOG(debug) << message.str();
 
         Buffer buffer(*buf, size);
         buffer.print();
@@ -63,18 +84,19 @@ int main() {
             HelloPacket packet(nonce);
             packet.deserialize(buffer);
             packet.process_packet(*connection);
+            cout << "a" << endl;
         }
         if (packet_id == 1) {
             unsigned short nonce = buffer.read_unsigned_short();
             ReliablePacket packet(nonce);
-            packet.deserialize(buffer);
-            packet.process_packet(*connection);
+            if (packet.deserialize(buffer)) {
+                packet.process_packet(*connection);
+            }
         }
         if (packet_id == 0x0c) {
             unsigned short nonce = buffer.read_unsigned_short();
             AcknowledgementPacket ack(nonce);
-            connection->sendPacket(*ack.serialize());
+            connection->sendPacket(ack);
         }
-
     }
 }

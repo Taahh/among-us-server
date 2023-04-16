@@ -14,13 +14,21 @@ constexpr bool is_little_endian = std::endian::native == std::endian::little;
 class Buffer {
 private:
     char *buffer;
+    bool deleteBuffer;
     unsigned int size;
 public:
-    Buffer(char &buffer, unsigned int size) : buffer(&buffer), size(size) {}
+    Buffer(char &buffer, unsigned int size) : buffer(&buffer), size(size), deleteBuffer(false) {}
 
     Buffer(int size) {
         this->buffer = new char[size];
+        this->deleteBuffer = true;
         this->size = 0;
+    }
+
+    ~Buffer() {
+        if (deleteBuffer) {
+            delete[] this->buffer;
+        }
     }
 
     char *getBuffer() const {
@@ -81,11 +89,19 @@ public:
 
     unsigned int read_unsigned_int();
 
+    unsigned int read_unsigned_int_le();
+
     int read_int();
+
+    int read_int_le();
 
     int read_unsigned_long();
 
     int read_long();
+
+    float read_float();
+
+    float read_float_le();
 
     string read_string();
 };

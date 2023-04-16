@@ -1,13 +1,14 @@
 #include "buffer.hpp"
 #include <plog/Log.h>
+#include <boost/format.hpp>
 
 void Buffer::print() {
     LOG(plog::debug) << "SIZE: " << getSize() << endl;
     LOG(plog::debug) << "DATA: ";
     for (int i = 0; i < getSize(); i++) {
-        LOG(plog::debug).printf("\%02hhx", buffer[i]);
+        printf("%02hhx", buffer[i]);
         if (i < size - 1) {
-            LOG(plog::debug) << " ";
+            cout << " ";
         }
     }
     cout << endl;
@@ -17,7 +18,7 @@ void Buffer::write_buffer(Buffer &buffer) {
     for (int i = 0; i < buffer.getSize(); i++) {
         write_byte(buffer.buffer[i]);
     }
-    delete &buffer;
+//    delete &buffer;
 }
 
 void Buffer::write_byte(int val) {
@@ -176,10 +177,22 @@ unsigned int Buffer::read_unsigned_int() {
     return is_little_endian ? boost::endian::endian_reverse(val) : val;
 }
 
+unsigned int Buffer::read_unsigned_int_le() {
+    unsigned int val = *(unsigned int *) buffer;
+    buffer += 4;
+    return !is_little_endian ? boost::endian::endian_reverse(val) : val;
+}
+
 int Buffer::read_int() {
     int val = *(int *) buffer;
     buffer += 4;
     return is_little_endian ? boost::endian::endian_reverse(val) : val;
+}
+
+int Buffer::read_int_le() {
+    int val = *(int *) buffer;
+    buffer += 4;
+    return !is_little_endian ? boost::endian::endian_reverse(val) : val;
 }
 
 int Buffer::read_unsigned_long() {
@@ -192,6 +205,30 @@ int Buffer::read_long() {
     long val = *(long *) buffer;
     buffer += 8;
     return is_little_endian ? boost::endian::endian_reverse(val) : val;
+}
+
+float Buffer::read_float() {
+    float val = *(float *) buffer;
+    buffer += 4;
+    if (is_little_endian) {
+        char c[sizeof val];
+        std::memcpy(c, &val, sizeof val);
+        std::reverse(c, c + sizeof val);
+        val = *(float*) c;
+    }
+    return val;
+}
+
+float Buffer::read_float_le() {
+    float val = *(float *) buffer;
+    buffer += 4;
+    if (!is_little_endian) {
+        char c[sizeof val];
+        std::memcpy(c, &val, sizeof val);
+        std::reverse(c, c + sizeof val);
+        val = *(float*) c;
+    }
+    return val;
 }
 
 string Buffer::read_string() {

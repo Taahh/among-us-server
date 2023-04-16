@@ -25,9 +25,9 @@ public:
         }
     }
 
-    Buffer *serialize() override;
+    void serialize(Buffer& buffer) override;
 
-    void deserialize(Buffer &buffer) override;
+    bool deserialize(Buffer &buffer) override;
 
     void process_packet(Connection &connection) override;
 };

@@ -8,11 +8,9 @@
 
 class HostServer : public Packet {
 public:
-    void deserialize(Buffer &buffer) override {
-        cout << "HOST SERVER" << endl;
-    }
+    bool deserialize(Buffer &buffer) override;
 
-    Buffer *serialize() override;
+    void serialize(Buffer& buffer) override;
 
     void process_packet(Connection &connection) override;
 };

@@ -1,17 +1,21 @@
+#include "../connection.hpp"
 #ifndef PACKET_HPP
 #define PACKET_HPP
 
 #include "../buffer/buffer.hpp"
 #include "../connection.hpp"
+#include <plog/Log.h>
+
+class Connection;
 
 class Serializable {
 public:
-    virtual Buffer* serialize() = 0;
+    virtual void serialize(Buffer& buffer) = 0;
 };
 
 class Deserializable {
 public:
-    virtual void deserialize(Buffer& buffer) = 0;
+    virtual bool deserialize(Buffer& buffer) = 0;
 };
 
 class Packet : public Serializable, public Deserializable {

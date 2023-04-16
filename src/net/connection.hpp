@@ -1,6 +1,8 @@
 #ifndef CONNECTION_HPP
 #define CONNECTION_HPP
 
+#include "packet/packet.hpp"
+
 #include <queue>
 #include <boost/asio.hpp>
 #include <boost/functional/hash.hpp>
@@ -23,7 +25,7 @@ private:
 public:
     Connection(udp::endpoint &endpoint, udp::socket& socket) : endpoint(&endpoint), socket(&socket), client_name(""), last_nonce_received(0), next_nonce(0) {}
 
-    void sendPacket(const Buffer& buffer);
+    void sendPacket(Packet& packet);
 
     udp::endpoint *getEndpoint() const {
         return endpoint;

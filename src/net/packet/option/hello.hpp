@@ -6,7 +6,7 @@
 
 class PlatformSpecificData : public Deserializable {
 public:
-    void deserialize(Buffer &buffer) override;
+    bool deserialize(Buffer &buffer) override;
 };
 
 class HelloPacket : public Packet {
@@ -16,11 +16,10 @@ private:
 public:
     HelloPacket(unsigned short nonce): nonce(nonce) {}
 
-    inline Buffer* serialize() override {
-        return nullptr;
+    inline void serialize(Buffer& buffer) override {
     }
 
-    void deserialize(Buffer &buffer) override;
+    bool deserialize(Buffer &buffer) override;
 
     void process_packet(Connection &connection) override;
 };
